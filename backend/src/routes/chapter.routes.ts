@@ -1,0 +1,14 @@
+import { Role } from '@prisma/client';
+import { Router } from 'express';
+import { deleteChapter, getChapter, updateChapter } from '../controllers/chapter.controller.js';
+import { createQuestion, getChapterQuiz } from '../controllers/quiz.controller.js';
+import { authenticate, authorize } from '../middlewares/auth.js';
+
+export const chapterRouter = Router();
+
+chapterRouter.get('/:chapterId', getChapter);
+chapterRouter.patch('/:chapterId', authenticate, authorize(Role.FORMATEUR), updateChapter);
+chapterRouter.delete('/:chapterId', authenticate, authorize(Role.FORMATEUR), deleteChapter);
+
+chapterRouter.get('/:chapterId/quiz', authenticate, getChapterQuiz);
+chapterRouter.post('/:chapterId/questions', authenticate, authorize(Role.FORMATEUR), createQuestion);
