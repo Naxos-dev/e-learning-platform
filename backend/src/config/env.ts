@@ -9,6 +9,8 @@ const envSchema = z.object({
   DATABASE_URL_POOLED: z
     .string()
     .min(1, 'DATABASE_URL_POOLED est requise (connexion poolée PostgreSQL)'),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET doit faire au moins 32 caractères'),
+  JWT_EXPIRES_IN: z.string().default('7d'),
 });
 
 const parsed = envSchema.safeParse(process.env);
