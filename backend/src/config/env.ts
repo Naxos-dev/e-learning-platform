@@ -5,7 +5,10 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(4000),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL est requise (connexion PostgreSQL)'),
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL est requise (connexion directe PostgreSQL)'),
+  DATABASE_URL_POOLED: z
+    .string()
+    .min(1, 'DATABASE_URL_POOLED est requise (connexion poolée PostgreSQL)'),
 });
 
 const parsed = envSchema.safeParse(process.env);

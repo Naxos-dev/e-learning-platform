@@ -37,7 +37,7 @@ curl http://localhost:4000/api/health
 ## Avancement
 
 - [x] Étape 1 — squelette du backend (Express/TS, structure routes/controllers/services)
-- [ ] Étape 2 — Prisma + schéma PostgreSQL
+- [x] Étape 2 — Prisma + schéma PostgreSQL
 - [ ] Étape 3 — Auth JWT + middleware de rôles
 - [ ] Étape 4 — API cours/chapitres/quiz
 - [ ] Étape 5 — Upload vidéo S3 (URLs pré-signées)
