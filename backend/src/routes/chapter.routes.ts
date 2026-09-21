@@ -1,6 +1,7 @@
 import { Role } from '@prisma/client';
 import { Router } from 'express';
 import { deleteChapter, getChapter, updateChapter } from '../controllers/chapter.controller.js';
+import { submitQuiz, updateProgress } from '../controllers/progress.controller.js';
 import { createQuestion, getChapterQuiz } from '../controllers/quiz.controller.js';
 import { confirmVideoUpload, deleteVideo, presignVideoUpload } from '../controllers/video.controller.js';
 import { authenticate, authorize } from '../middlewares/auth.js';
@@ -22,3 +23,6 @@ chapterRouter.post(
 );
 chapterRouter.patch('/:chapterId/video', authenticate, authorize(Role.FORMATEUR), confirmVideoUpload);
 chapterRouter.delete('/:chapterId/video', authenticate, authorize(Role.FORMATEUR), deleteVideo);
+
+chapterRouter.put('/:chapterId/progress', authenticate, authorize(Role.APPRENANT), updateProgress);
+chapterRouter.post('/:chapterId/quiz/submit', authenticate, authorize(Role.APPRENANT), submitQuiz);

@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { createCourseSchema, updateCourseSchema } from '../schemas/course.schema.js';
 import * as courseService from '../services/course.service.js';
+import * as dashboardService from '../services/dashboard.service.js';
 import { AppError } from '../utils/AppError.js';
 import { requireParam } from '../utils/params.js';
 
@@ -35,4 +36,12 @@ export async function updateCourse(req: Request, res: Response): Promise<void> {
 export async function deleteCourse(req: Request, res: Response): Promise<void> {
   await courseService.deleteCourse(requireParam(req, 'courseId'), req.user!.id);
   res.status(204).send();
+}
+
+export async function getCourseDashboard(req: Request, res: Response): Promise<void> {
+  const dashboard = await dashboardService.getCourseDashboard(
+    requireParam(req, 'courseId'),
+    req.user!.id,
+  );
+  res.json(dashboard);
 }

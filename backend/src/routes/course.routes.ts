@@ -5,9 +5,11 @@ import {
   createCourse,
   deleteCourse,
   getCourse,
+  getCourseDashboard,
   listCourses,
   updateCourse,
 } from '../controllers/course.controller.js';
+import { enroll } from '../controllers/enrollment.controller.js';
 import { authenticate, authorize } from '../middlewares/auth.js';
 
 export const courseRouter = Router();
@@ -20,3 +22,6 @@ courseRouter.delete('/:courseId', authenticate, authorize(Role.FORMATEUR), delet
 
 courseRouter.get('/:courseId/chapters', listChapters);
 courseRouter.post('/:courseId/chapters', authenticate, authorize(Role.FORMATEUR), createChapter);
+
+courseRouter.post('/:courseId/enroll', authenticate, authorize(Role.APPRENANT), enroll);
+courseRouter.get('/:courseId/dashboard', authenticate, authorize(Role.FORMATEUR), getCourseDashboard);
