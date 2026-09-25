@@ -54,7 +54,10 @@ export async function getCourseDashboard(courseId: string, userId: string) {
         chapterTitle: chapter.title,
         questionCount,
         submissionCount: agg?._count._all ?? 0,
-        averageScore: agg?._avg.quizScore ?? null,
+        averageScore:
+          agg?._avg.quizScore !== undefined && agg?._avg.quizScore !== null
+            ? Math.round(agg._avg.quizScore * 100) / 100
+            : null,
       },
     ];
   });

@@ -166,6 +166,43 @@ describe('Enrollment & progress', () => {
     expect(s1Row).toBeDefined();
   });
 
+  it('rounds a repeating-decimal average score to 2 decimals', async () => {
+    const { formateurToken, courseId, chapterId, questionId, correctOptionId, wrongOptionId } =
+      await setupCourseWithQuiz();
+
+    const students = await Promise.all([
+      registerUser(uniqueEmail('r1'), 'APPRENANT'),
+      registerUser(uniqueEmail('r2'), 'APPRENANT'),
+      registerUser(uniqueEmail('r3'), 'APPRENANT'),
+    ]);
+    for (const student of students) {
+      await request(app)
+        .post(`/api/courses/${courseId}/enroll`)
+        .set(...authHeader(student.token));
+    }
+
+    // 100 + 100 + 0 -> moyenne réelle 66.666...
+    await request(app)
+      .post(`/api/chapters/${chapterId}/quiz/submit`)
+      .set(...authHeader(students[0]!.token))
+      .send({ answers: [{ questionId, optionId: correctOptionId }] });
+    await request(app)
+      .post(`/api/chapters/${chapterId}/quiz/submit`)
+      .set(...authHeader(students[1]!.token))
+      .send({ answers: [{ questionId, optionId: correctOptionId }] });
+    await request(app)
+      .post(`/api/chapters/${chapterId}/quiz/submit`)
+      .set(...authHeader(students[2]!.token))
+      .send({ answers: [{ questionId, optionId: wrongOptionId }] });
+
+    const dashboard = await request(app)
+      .get(`/api/courses/${courseId}/dashboard`)
+      .set(...authHeader(formateurToken));
+
+    expect(dashboard.status).toBe(200);
+    expect(dashboard.body.quizStats[0].averageScore).toBe(66.67);
+  });
+
   it('forbids a non-owner formateur from viewing the dashboard', async () => {
     const { courseId } = await setupCourseWithQuiz();
     const { token: otherFormateur } = await registerUser(uniqueEmail('other-formateur'), 'FORMATEUR');

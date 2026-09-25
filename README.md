@@ -45,9 +45,28 @@ npm run dev
 
 L'app démarre sur `http://localhost:5173` (le backend doit tourner sur `http://localhost:4000` en parallèle).
 
+## Données de démo
+
+Un script de seed peuple la base avec un jeu de données réaliste (comptes, cours, chapitres, quiz,
+inscriptions et progression variée) pour servir de vitrine :
+
+```bash
+cd backend
+npm run db:seed
+```
+
+Idempotent : relançable sans dupliquer les données (les comptes de démo précédents sont supprimés
+avant recréation). Contenu généré :
+
+- **2 formateurs**, **4 apprenants**, **3 cours** (Vue 3, Node.js/Express, PostgreSQL/Prisma), 8
+  chapitres, 6 questions de quiz, 7 inscriptions avec progression et scores variés
+- Identifiants de démo (mot de passe commun à tous les comptes) :
+  - `formateur.demo@example.com` / `Demo1234!` — voir le dashboard sur ses cours Vue 3 et Node/Express
+  - `apprenant.demo@example.com` / `Demo1234!` — progression partielle sur plusieurs cours
+
 ## Tests
 
-Suite Vitest + Supertest (36 tests) contre une branche Neon dédiée (jamais la base de dev/prod) :
+Suite Vitest + Supertest (37 tests) contre une branche Neon dédiée (jamais la base de dev/prod) :
 auth, ownership cours/chapitres/quiz, scoring de quiz, inscription/progression, agrégation du
 dashboard formateur, upload vidéo (SDK S3 mocké).
 
