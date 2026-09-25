@@ -34,6 +34,22 @@ Le serveur démarre sur `http://localhost:4000`. Vérifier qu'il tourne :
 curl http://localhost:4000/api/health
 ```
 
+## Tests
+
+Suite Vitest + Supertest (36 tests) contre une branche Neon dédiée (jamais la base de dev/prod) :
+auth, ownership cours/chapitres/quiz, scoring de quiz, inscription/progression, agrégation du
+dashboard formateur, upload vidéo (SDK S3 mocké).
+
+```bash
+cd backend
+cp .env.test.example .env.test   # à créer : branche Neon "test" séparée, voir ci-dessous
+npm test
+```
+
+Créer la branche de test dans la console Neon (**Branches → Create branch**, nom `test`), copier ses
+deux connection strings (directe + poolée) dans `backend/.env.test`. Les migrations sont appliquées
+automatiquement avant chaque run (`globalSetup`).
+
 ## Avancement
 
 - [x] Étape 1 — squelette du backend (Express/TS, structure routes/controllers/services)
@@ -42,6 +58,6 @@ curl http://localhost:4000/api/health
 - [x] Étape 4 — API cours/chapitres/quiz
 - [x] Étape 5 — Upload vidéo S3 (URLs pré-signées)
 - [x] Étape 6 — Inscription/progression + dashboard formateur
-- [ ] Étape 7 — Tests sur les routes critiques
+- [x] Étape 7 — Tests sur les routes critiques (36 tests, Vitest + Supertest)
 - [ ] Étape 8 — Frontend Vue
 - [ ] Étape 9 — Déploiement

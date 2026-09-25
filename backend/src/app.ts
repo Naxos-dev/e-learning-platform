@@ -13,7 +13,9 @@ export function createApp(): Express {
   app.use(helmet());
   app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
   app.use(express.json());
-  app.use(morgan(env.NODE_ENV === 'development' ? 'dev' : 'combined'));
+  if (env.NODE_ENV !== 'test') {
+    app.use(morgan(env.NODE_ENV === 'development' ? 'dev' : 'combined'));
+  }
 
   app.use('/api', apiRouter);
 
