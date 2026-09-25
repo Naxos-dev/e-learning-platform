@@ -5,7 +5,7 @@ axé sur les compétences backend : Node.js, TypeScript, PostgreSQL/Prisma, uplo
 
 ## Stack
 
-- **Frontend** : Vue 3 (`frontend/`, à venir)
+- **Frontend** : Vue 3, TypeScript, Vite, Vue Router, Pinia, Tailwind CSS (`frontend/`)
 - **Backend** : Node.js, Express 5, TypeScript (`backend/`)
 - **Base de données** : PostgreSQL + Prisma ORM
 - **Stockage vidéo** : AWS S3 (URLs pré-signées)
@@ -16,7 +16,7 @@ axé sur les compétences backend : Node.js, TypeScript, PostgreSQL/Prisma, uplo
 ```
 e-learning-platform/
 ├── backend/     API Express/TypeScript
-└── frontend/    App Vue 3 (étape ultérieure)
+└── frontend/    App Vue 3 / TypeScript
 ```
 
 ## Démarrer le backend
@@ -33,6 +33,17 @@ Le serveur démarre sur `http://localhost:4000`. Vérifier qu'il tourne :
 ```bash
 curl http://localhost:4000/api/health
 ```
+
+## Démarrer le frontend
+
+```bash
+cd frontend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+L'app démarre sur `http://localhost:5173` (le backend doit tourner sur `http://localhost:4000` en parallèle).
 
 ## Tests
 
@@ -59,5 +70,5 @@ automatiquement avant chaque run (`globalSetup`).
 - [x] Étape 5 — Upload vidéo S3 (URLs pré-signées)
 - [x] Étape 6 — Inscription/progression + dashboard formateur
 - [x] Étape 7 — Tests sur les routes critiques (36 tests, Vitest + Supertest)
-- [ ] Étape 8 — Frontend Vue
+- [x] Étape 8 — Frontend Vue (auth, cours/chapitres, quiz, progression, dashboard formateur, upload vidéo)
 - [ ] Étape 9 — Déploiement
