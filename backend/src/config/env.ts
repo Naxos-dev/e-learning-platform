@@ -20,7 +20,10 @@ const envSchema = z.object({
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
-  console.error('Variables d\'environnement invalides :', z.treeifyError(parsed.error));
+  console.error(
+    "Variables d'environnement invalides :",
+    JSON.stringify(z.treeifyError(parsed.error), null, 2),
+  );
   process.exit(1);
 }
 
