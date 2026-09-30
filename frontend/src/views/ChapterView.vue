@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth'
@@ -21,6 +21,19 @@ const completed = ref(false)
 
 const isOwner = computed(() => auth.isFormateur && auth.user?.id === course.value?.authorId)
 
+const currentIndex = computed(() => {
+  if (!course.value || !chapter.value) return -1
+  return course.value.chapters.findIndex((c) => c.id === chapter.value!.id)
+})
+const previousChapter = computed(() => {
+  if (currentIndex.value <= 0 || !course.value) return null
+  return course.value.chapters[currentIndex.value - 1] ?? null
+})
+const nextChapter = computed(() => {
+  if (currentIndex.value === -1 || !course.value) return null
+  return course.value.chapters[currentIndex.value + 1] ?? null
+})
+
 async function load() {
   loading.value = true
   error.value = null
@@ -35,6 +48,7 @@ async function load() {
 }
 
 async function loadProgress() {
+  completed.value = false
   if (!auth.isApprenant) return
   try {
     const enrollments = await api.get<EnrollmentSummary[]>('/enrollments/me')
@@ -75,6 +89,17 @@ async function handleDeleteChapter() {
 function handleVideoUpdate(url: string | null) {
   if (chapter.value) chapter.value.videoUrl = url
 }
+
+// Vue Router réutilise ce composant en naviguant entre deux chapitres du même cours
+// (même route "chapter-detail", seul le param change) : sans ce watch, le contenu
+// affiché resterait celui de l'ancien chapitre après un clic sur précédent/suivant.
+watch(
+  () => props.chapterId,
+  () => {
+    void load()
+    void loadProgress()
+  },
+)
 
 onMounted(() => {
   void load()
@@ -150,6 +175,32 @@ onMounted(() => {
           <RouterLink to="/login" class="underline">Connectez-vous</RouterLink> en tant qu'apprenant pour
           passer le quiz.
         </p>
+      </div>
+
+      <div class="mt-8 flex items-stretch justify-between gap-4 border-t border-slate-200 pt-6">
+        <RouterLink
+          v-if="previousChapter"
+          :to="{ name: 'chapter-detail', params: { chapterId: previousChapter.id } }"
+          class="flex max-w-[45%] flex-col rounded-md border border-slate-300 px-4 py-2 text-right hover:bg-slate-100"
+        >
+          <span class="text-xs text-slate-500">‹ Précédent</span>
+          <span class="truncate text-sm font-medium text-slate-800">{{ previousChapter.title }}</span>
+        </RouterLink>
+        <span v-else class="max-w-[45%] rounded-md border border-slate-200 px-4 py-2 text-sm text-slate-300">
+          ‹ Précédent
+        </span>
+
+        <RouterLink
+          v-if="nextChapter"
+          :to="{ name: 'chapter-detail', params: { chapterId: nextChapter.id } }"
+          class="flex max-w-[45%] flex-col rounded-md border border-slate-300 px-4 py-2 text-left hover:bg-slate-100"
+        >
+          <span class="text-xs text-slate-500">Suivant ›</span>
+          <span class="truncate text-sm font-medium text-slate-800">{{ nextChapter.title }}</span>
+        </RouterLink>
+        <span v-else class="max-w-[45%] rounded-md border border-slate-200 px-4 py-2 text-right text-sm text-slate-300">
+          Suivant ›
+        </span>
       </div>
     </template>
   </div>
