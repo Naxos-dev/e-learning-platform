@@ -15,7 +15,25 @@ function handleLogout() {
   <div class="min-h-screen bg-slate-50">
     <header class="border-b border-slate-200 bg-white">
       <nav class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <RouterLink to="/" class="text-lg font-semibold text-slate-900">E-learning</RouterLink>
+        <RouterLink to="/" class="flex items-center gap-2 text-lg font-semibold text-slate-900">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-5 w-5 shrink-0"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 6.5c-1.5-1-4-1.5-6-1.5a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1c2 0 4.5.5 6 1.5c1.5-1 4-1.5 6-1.5a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1c-2 0-4.5.5-6 1.5Z"
+            />
+            <path d="M12 6.5V19" />
+          </svg>
+          LearnFlow
+        </RouterLink>
 
         <div class="flex items-center gap-4 text-sm">
           <RouterLink to="/" class="text-slate-600 hover:text-slate-900">Cours</RouterLink>
