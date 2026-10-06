@@ -15,6 +15,9 @@ const envSchema = z.object({
   AWS_ACCESS_KEY_ID: z.string().min(1, 'AWS_ACCESS_KEY_ID est requise'),
   AWS_SECRET_ACCESS_KEY: z.string().min(1, 'AWS_SECRET_ACCESS_KEY est requise'),
   AWS_S3_BUCKET: z.string().min(1, 'AWS_S3_BUCKET est requise'),
+  // Optionnelles : notification email à l'inscription (désactivée si absentes, voir email.service.ts).
+  RESEND_API_KEY: z.string().optional(),
+  NOTIFICATION_EMAIL: z.email().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

@@ -3,6 +3,7 @@ import { prisma } from '../config/prisma.js';
 import { AppError } from '../utils/AppError.js';
 import { signAccessToken } from '../utils/jwt.js';
 import { comparePassword, hashPassword } from '../utils/password.js';
+import { notifyNewRegistration } from './email.service.js';
 
 export interface SafeUser {
   id: string;
@@ -34,6 +35,8 @@ export async function registerUser(
   const user = await prisma.user.create({
     data: { email, passwordHash, ...(role ? { role } : {}) },
   });
+
+  await notifyNewRegistration(user.email, user.role);
 
   const token = signAccessToken({ sub: user.id, role: user.role });
   return { user: toSafeUser(user), token };
