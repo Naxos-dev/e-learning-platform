@@ -101,7 +101,9 @@ describe('Courses & chapters', () => {
       .set(...authHeader(token));
     expect(del.status).toBe(204);
 
-    const getChapter = await request(app).get(`/api/chapters/${chapter.body.id}`);
+    const getChapter = await request(app)
+      .get(`/api/chapters/${chapter.body.id}`)
+      .set(...authHeader(token));
     expect(getChapter.status).toBe(404);
   });
 });

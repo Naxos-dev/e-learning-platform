@@ -16,6 +16,7 @@ const chapter = ref<Chapter | null>(null)
 const course = ref<CourseDetail | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
+const needsLogin = ref(false)
 const completing = ref(false)
 const completed = ref(false)
 
@@ -37,11 +38,16 @@ const nextChapter = computed(() => {
 async function load() {
   loading.value = true
   error.value = null
+  needsLogin.value = false
   try {
     chapter.value = await api.get<Chapter>(`/chapters/${props.chapterId}`)
     course.value = await api.get<CourseDetail>(`/courses/${chapter.value.courseId}`)
   } catch (err) {
-    error.value = err instanceof ApiError ? err.message : 'Impossible de charger le chapitre'
+    if (err instanceof ApiError && err.status === 401) {
+      needsLogin.value = true
+    } else {
+      error.value = err instanceof ApiError ? err.message : 'Impossible de charger le chapitre'
+    }
   } finally {
     loading.value = false
   }
@@ -110,6 +116,17 @@ onMounted(() => {
 <template>
   <div>
     <p v-if="loading" class="text-slate-500">Chargement...</p>
+
+    <div v-else-if="needsLogin" class="rounded-md border border-slate-200 bg-slate-50 p-6 text-center">
+      <p class="text-slate-700">🔒 Ce chapitre est réservé aux membres connectés.</p>
+      <RouterLink
+        :to="{ name: 'login', query: { redirect: $route.fullPath } }"
+        class="mt-3 inline-block rounded-md bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-700"
+      >
+        Se connecter
+      </RouterLink>
+    </div>
+
     <p v-else-if="error && !chapter" class="text-red-600">{{ error }}</p>
 
     <template v-else-if="chapter">

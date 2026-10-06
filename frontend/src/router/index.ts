@@ -68,6 +68,7 @@ const router = createRouter({
       name: 'chapter-detail',
       component: () => import('@/views/ChapterView.vue'),
       props: true,
+      meta: { requiresAuth: true },
     },
     {
       path: '/chapters/:chapterId/edit',

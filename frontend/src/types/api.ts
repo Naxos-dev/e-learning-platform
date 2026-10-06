@@ -28,6 +28,17 @@ export interface CourseSummary {
   _count: { chapters: number; enrollments: number }
 }
 
+// Syllabus public : jamais de contenu/vidéo (l'API ne les renvoie pas pour ces endpoints).
+export interface ChapterSummary {
+  id: string
+  courseId: string
+  title: string
+  order: number
+  createdAt: string
+  updatedAt: string
+}
+
+// Chapitre complet : uniquement renvoyé par GET /chapters/:id, qui exige d'être connecté.
 export interface Chapter {
   id: string
   courseId: string
@@ -52,7 +63,7 @@ export interface CourseDetail {
   createdAt: string
   updatedAt: string
   author: CourseAuthor
-  chapters: Chapter[]
+  chapters: ChapterSummary[]
 }
 
 export interface Option {

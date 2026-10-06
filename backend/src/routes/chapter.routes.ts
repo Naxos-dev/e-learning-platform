@@ -8,7 +8,7 @@ import { authenticate, authorize } from '../middlewares/auth.js';
 
 export const chapterRouter = Router();
 
-chapterRouter.get('/:chapterId', getChapter);
+chapterRouter.get('/:chapterId', authenticate, getChapter);
 chapterRouter.patch('/:chapterId', authenticate, authorize(Role.FORMATEUR), updateChapter);
 chapterRouter.delete('/:chapterId', authenticate, authorize(Role.FORMATEUR), deleteChapter);
 
