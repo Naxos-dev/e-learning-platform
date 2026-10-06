@@ -1,6 +1,7 @@
 import { prisma } from '../config/prisma.js';
 import type { CreateCourseInput, UpdateCourseInput } from '../schemas/course.schema.js';
 import { AppError } from '../utils/AppError.js';
+import { chapterSummarySelect } from './chapter.service.js';
 
 export function createCourse(authorId: string, input: CreateCourseInput) {
   return prisma.course.create({
@@ -27,7 +28,7 @@ export async function getCourseDetail(courseId: string) {
     where: { id: courseId },
     include: {
       author: { select: { id: true, email: true } },
-      chapters: { orderBy: { order: 'asc' } },
+      chapters: { orderBy: { order: 'asc' }, select: chapterSummarySelect },
     },
   });
   if (!course) {

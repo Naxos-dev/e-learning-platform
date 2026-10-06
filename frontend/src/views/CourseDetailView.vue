@@ -140,7 +140,9 @@ onMounted(() => {
               class="flex items-center justify-between rounded-md border border-slate-200 bg-white px-4 py-3 hover:border-slate-400"
             >
               <span class="text-slate-800">{{ chapter.order }}. {{ chapter.title }}</span>
-              <span v-if="chapter.videoUrl" class="text-xs text-slate-400">🎬 vidéo</span>
+              <span v-if="!auth.isAuthenticated" class="flex items-center gap-1 text-xs text-slate-400">
+                🔒 Connexion requise
+              </span>
             </RouterLink>
           </li>
         </ol>

@@ -1,11 +1,27 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma.js';
 import type { CreateChapterInput, UpdateChapterInput } from '../schemas/chapter.schema.js';
 import { AppError } from '../utils/AppError.js';
 import { isUniqueConstraintError } from '../utils/prismaErrors.js';
 import { assertCourseOwner } from './course.service.js';
 
+// Aperçu public du syllabus : jamais de contenu/vidéo ici. Le contenu complet d'un chapitre
+// n'est servi que par getChapterDetail, route protégée par authenticate.
+export const chapterSummarySelect = {
+  id: true,
+  courseId: true,
+  title: true,
+  order: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.ChapterSelect;
+
 export function listChapters(courseId: string) {
-  return prisma.chapter.findMany({ where: { courseId }, orderBy: { order: 'asc' } });
+  return prisma.chapter.findMany({
+    where: { courseId },
+    orderBy: { order: 'asc' },
+    select: chapterSummarySelect,
+  });
 }
 
 export async function getChapterDetail(chapterId: string) {
