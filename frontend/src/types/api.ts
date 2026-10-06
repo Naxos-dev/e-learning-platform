@@ -113,10 +113,21 @@ export interface Progress {
   updatedAt: string
 }
 
+export interface QuizQuestionResult {
+  questionId: string
+  questionText: string
+  selectedOptionId: string
+  selectedOptionText: string
+  isCorrect: boolean
+  correctOptionId: string | null
+  correctOptionText: string | null
+}
+
 export interface QuizSubmitResult {
   score: number
   correctCount: number
   totalQuestions: number
+  results: QuizQuestionResult[]
 }
 
 export interface DashboardStudent {
