@@ -46,50 +46,52 @@ async function handleSubmit() {
 
 <template>
   <div class="mx-auto max-w-lg">
-    <h1 class="mb-6 text-2xl font-semibold text-slate-900">
-      {{ isEdit ? 'Modifier le cours' : 'Nouveau cours' }}
-    </h1>
+    <div class="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+      <h1 class="mb-6 text-2xl font-semibold text-slate-900">
+        {{ isEdit ? 'Modifier le cours' : 'Nouveau cours' }}
+      </h1>
 
-    <form class="space-y-4" @submit.prevent="handleSubmit">
-      <div>
-        <label for="title" class="block text-sm font-medium text-slate-700">Titre</label>
-        <input
-          id="title"
-          v-model="title"
-          type="text"
-          required
-          minlength="3"
-          class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-slate-500 focus:outline-none"
-        />
-      </div>
+      <form class="space-y-4" @submit.prevent="handleSubmit">
+        <div>
+          <label for="title" class="block text-sm font-medium text-slate-700">Titre</label>
+          <input
+            id="title"
+            v-model="title"
+            type="text"
+            required
+            minlength="3"
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-slate-500 focus:outline-none"
+          />
+        </div>
 
-      <div>
-        <label for="description" class="block text-sm font-medium text-slate-700">Description</label>
-        <textarea
-          id="description"
-          v-model="description"
-          rows="4"
-          class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-slate-500 focus:outline-none"
-        />
-      </div>
+        <div>
+          <label for="description" class="block text-sm font-medium text-slate-700">Description</label>
+          <textarea
+            id="description"
+            v-model="description"
+            rows="4"
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-slate-500 focus:outline-none"
+          />
+        </div>
 
-      <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+        <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
 
-      <div class="flex gap-2">
-        <button
-          type="submit"
-          :disabled="loading"
-          class="rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-700 disabled:opacity-50"
-        >
-          {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
-        </button>
-        <RouterLink
-          to="/"
-          class="rounded-md border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-100"
-        >
-          Annuler
-        </RouterLink>
-      </div>
-    </form>
+        <div class="flex gap-2">
+          <button
+            type="submit"
+            :disabled="loading"
+            class="rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-700 disabled:opacity-50"
+          >
+            {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
+          </button>
+          <RouterLink
+            to="/"
+            class="rounded-md border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-100"
+          >
+            Annuler
+          </RouterLink>
+        </div>
+      </form>
+    </div>
   </div>
 </template>

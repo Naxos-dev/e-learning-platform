@@ -41,15 +41,26 @@ export async function submitQuiz(chapterId: string, userId: string, input: Submi
   }
 
   let correctCount = 0;
+  const results = [];
   for (const question of quiz.questions) {
     const answer = input.answers.find((a) => a.questionId === question.id);
-    const option = question.options.find((o) => o.id === answer?.optionId);
-    if (!option) {
+    const selectedOption = question.options.find((o) => o.id === answer?.optionId);
+    if (!selectedOption) {
       throw new AppError(400, `optionId invalide pour la question ${question.id}`);
     }
-    if (option.isCorrect) {
+    const correctOption = question.options.find((o) => o.isCorrect);
+    if (selectedOption.isCorrect) {
       correctCount += 1;
     }
+    results.push({
+      questionId: question.id,
+      questionText: question.text,
+      selectedOptionId: selectedOption.id,
+      selectedOptionText: selectedOption.text,
+      isCorrect: selectedOption.isCorrect,
+      correctOptionId: correctOption?.id ?? null,
+      correctOptionText: correctOption?.text ?? null,
+    });
   }
 
   const score = Math.round((correctCount / quiz.questions.length) * 10000) / 100;
@@ -60,5 +71,5 @@ export async function submitQuiz(chapterId: string, userId: string, input: Submi
     update: { quizScore: score },
   });
 
-  return { score, correctCount, totalQuestions: quiz.questions.length };
+  return { score, correctCount, totalQuestions: quiz.questions.length, results };
 }

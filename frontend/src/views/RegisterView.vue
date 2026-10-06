@@ -29,62 +29,64 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-sm">
-    <h1 class="mb-6 text-2xl font-semibold text-slate-900">Inscription</h1>
+  <div class="mx-auto flex min-h-[65vh] max-w-sm flex-col justify-center">
+    <div class="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+      <h1 class="mb-6 text-2xl font-semibold text-slate-900">Inscription</h1>
 
-    <form class="space-y-4" @submit.prevent="handleSubmit">
-      <div>
-        <label for="email" class="block text-sm font-medium text-slate-700">Email</label>
-        <input
-          id="email"
-          v-model="email"
-          type="email"
-          required
-          class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-slate-500 focus:outline-none"
-        />
-      </div>
-
-      <div>
-        <label for="password" class="block text-sm font-medium text-slate-700">Mot de passe</label>
-        <input
-          id="password"
-          v-model="password"
-          type="password"
-          minlength="8"
-          required
-          class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-slate-500 focus:outline-none"
-        />
-        <p class="mt-1 text-xs text-slate-500">8 caractères minimum</p>
-      </div>
-
-      <fieldset>
-        <legend class="block text-sm font-medium text-slate-700">Je suis...</legend>
-        <div class="mt-1 flex gap-4">
-          <label class="flex items-center gap-2 text-sm text-slate-700">
-            <input v-model="role" type="radio" value="APPRENANT" />
-            Apprenant
-          </label>
-          <label class="flex items-center gap-2 text-sm text-slate-700">
-            <input v-model="role" type="radio" value="FORMATEUR" />
-            Formateur
-          </label>
+      <form class="space-y-4" @submit.prevent="handleSubmit">
+        <div>
+          <label for="email" class="block text-sm font-medium text-slate-700">Email</label>
+          <input
+            id="email"
+            v-model="email"
+            type="email"
+            required
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-slate-500 focus:outline-none"
+          />
         </div>
-      </fieldset>
 
-      <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+        <div>
+          <label for="password" class="block text-sm font-medium text-slate-700">Mot de passe</label>
+          <input
+            id="password"
+            v-model="password"
+            type="password"
+            minlength="8"
+            required
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-slate-500 focus:outline-none"
+          />
+          <p class="mt-1 text-xs text-slate-500">8 caractères minimum</p>
+        </div>
 
-      <button
-        type="submit"
-        :disabled="loading"
-        class="w-full rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-700 disabled:opacity-50"
-      >
-        {{ loading ? 'Inscription...' : "S'inscrire" }}
-      </button>
-    </form>
+        <fieldset>
+          <legend class="block text-sm font-medium text-slate-700">Je suis...</legend>
+          <div class="mt-1 flex gap-4">
+            <label class="flex items-center gap-2 text-sm text-slate-700">
+              <input v-model="role" type="radio" value="APPRENANT" />
+              Apprenant
+            </label>
+            <label class="flex items-center gap-2 text-sm text-slate-700">
+              <input v-model="role" type="radio" value="FORMATEUR" />
+              Formateur
+            </label>
+          </div>
+        </fieldset>
 
-    <p class="mt-4 text-sm text-slate-600">
-      Déjà un compte ?
-      <RouterLink to="/login" class="font-medium text-slate-900 underline">Se connecter</RouterLink>
-    </p>
+        <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+
+        <button
+          type="submit"
+          :disabled="loading"
+          class="w-full rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-700 disabled:opacity-50"
+        >
+          {{ loading ? 'Inscription...' : "S'inscrire" }}
+        </button>
+      </form>
+
+      <p class="mt-4 text-sm text-slate-600">
+        Déjà un compte ?
+        <RouterLink to="/login" class="font-medium text-slate-900 underline">Se connecter</RouterLink>
+      </p>
+    </div>
   </div>
 </template>

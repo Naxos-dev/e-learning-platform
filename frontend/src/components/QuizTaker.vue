@@ -58,13 +58,32 @@ onMounted(loadQuiz)
   <div v-else-if="quiz && quiz.questions.length > 0">
     <h3 class="text-lg font-semibold text-slate-900">Quiz</h3>
 
-    <div v-if="result" class="mt-3 rounded-md border border-slate-200 bg-slate-50 p-4">
-      <p class="text-lg font-semibold" :class="result.score >= 50 ? 'text-green-700' : 'text-red-600'">
-        Score : {{ result.score }}% ({{ result.correctCount }}/{{ result.totalQuestions }})
-      </p>
-      <button type="button" class="mt-2 text-sm text-slate-900 underline" @click="retake">
-        Repasser le quiz
-      </button>
+    <div v-if="result" class="mt-3 space-y-4">
+      <div class="rounded-md border border-slate-200 bg-slate-50 p-4">
+        <p class="text-lg font-semibold" :class="result.score >= 50 ? 'text-green-700' : 'text-red-600'">
+          Score : {{ result.score }}% ({{ result.correctCount }}/{{ result.totalQuestions }})
+        </p>
+        <button type="button" class="mt-2 text-sm text-slate-900 underline" @click="retake">
+          Repasser le quiz
+        </button>
+      </div>
+
+      <ul class="space-y-3">
+        <li
+          v-for="item in result.results"
+          :key="item.questionId"
+          class="rounded-md border p-4"
+          :class="item.isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'"
+        >
+          <p class="font-medium text-slate-800">{{ item.questionText }}</p>
+          <p class="mt-1 text-sm" :class="item.isCorrect ? 'text-green-700' : 'text-red-700'">
+            {{ item.isCorrect ? '✓' : '✗' }} Votre réponse : {{ item.selectedOptionText }}
+          </p>
+          <p v-if="!item.isCorrect && item.correctOptionText" class="mt-0.5 text-sm text-green-700">
+            ✓ Bonne réponse : {{ item.correctOptionText }}
+          </p>
+        </li>
+      </ul>
     </div>
 
     <form v-else class="mt-3 space-y-4" @submit.prevent="handleSubmit">

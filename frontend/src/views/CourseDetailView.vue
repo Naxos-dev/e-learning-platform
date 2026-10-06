@@ -14,6 +14,8 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const enrolling = ref(false)
 const isEnrolled = ref(false)
+const enrollmentChecked = ref(false)
+const completedChapterIds = ref<Set<string>>(new Set())
 
 const isOwner = computed(() => auth.isFormateur && auth.user?.id === course.value?.authorId)
 
@@ -30,12 +32,21 @@ async function loadCourse() {
 }
 
 async function checkEnrollment() {
-  if (!auth.isApprenant) return
+  if (!auth.isApprenant) {
+    enrollmentChecked.value = true
+    return
+  }
   try {
     const enrollments = await api.get<EnrollmentSummary[]>('/enrollments/me')
-    isEnrolled.value = enrollments.some((e) => e.course.id === props.courseId)
+    const enrollment = enrollments.find((e) => e.course.id === props.courseId)
+    isEnrolled.value = Boolean(enrollment)
+    completedChapterIds.value = new Set(
+      enrollment?.progress.filter((p) => p.completed).map((p) => p.chapterId) ?? [],
+    )
   } catch {
     // Le bouton d'inscription reste affiché par défaut ; l'erreur n'est pas bloquante ici.
+  } finally {
+    enrollmentChecked.value = true
   }
 }
 
@@ -102,18 +113,18 @@ onMounted(() => {
           </button>
         </div>
 
-        <button
-          v-else-if="auth.isApprenant && !isEnrolled"
-          type="button"
-          :disabled="enrolling"
-          class="shrink-0 rounded-md bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-700 disabled:opacity-50"
-          @click="handleEnroll"
-        >
-          {{ enrolling ? 'Inscription...' : "S'inscrire" }}
-        </button>
-        <span v-else-if="auth.isApprenant" class="shrink-0 text-sm font-medium text-green-700">
-          ✓ Inscrit
-        </span>
+        <template v-else-if="auth.isApprenant && enrollmentChecked">
+          <button
+            v-if="!isEnrolled"
+            type="button"
+            :disabled="enrolling"
+            class="shrink-0 rounded-md bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-700 disabled:opacity-50"
+            @click="handleEnroll"
+          >
+            {{ enrolling ? 'Inscription...' : "S'inscrire" }}
+          </button>
+          <span v-else class="shrink-0 text-sm font-medium text-green-700">✓ Inscrit</span>
+        </template>
       </div>
 
       <p v-if="course.description" class="mt-4 text-slate-700">{{ course.description }}</p>
@@ -142,6 +153,12 @@ onMounted(() => {
               <span class="text-slate-800">{{ chapter.order }}. {{ chapter.title }}</span>
               <span v-if="!auth.isAuthenticated" class="flex items-center gap-1 text-xs text-slate-400">
                 🔒 Connexion requise
+              </span>
+              <span
+                v-else-if="completedChapterIds.has(chapter.id)"
+                class="flex items-center gap-1 text-xs font-medium text-green-700"
+              >
+                ✓ Terminé
               </span>
             </RouterLink>
           </li>
