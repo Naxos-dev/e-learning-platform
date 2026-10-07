@@ -9,8 +9,8 @@ export async function register(req: Request, res: Response): Promise<void> {
     throw new AppError(400, parsed.error.issues[0]?.message ?? 'Requête invalide');
   }
 
-  const { email, password, role } = parsed.data;
-  const result = await registerUser(email, password, role);
+  const { email, password } = parsed.data;
+  const result = await registerUser(email, password);
   res.status(201).json(result);
 }
 

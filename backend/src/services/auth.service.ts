@@ -21,11 +21,7 @@ function toSafeUser(user: User): SafeUser {
   return { id: user.id, email: user.email, role: user.role, createdAt: user.createdAt };
 }
 
-export async function registerUser(
-  email: string,
-  password: string,
-  role?: Role,
-): Promise<AuthResult> {
+export async function registerUser(email: string, password: string): Promise<AuthResult> {
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     throw new AppError(409, 'Un compte existe déjà avec cet email');
@@ -33,7 +29,7 @@ export async function registerUser(
 
   const passwordHash = await hashPassword(password);
   const user = await prisma.user.create({
-    data: { email, passwordHash, ...(role ? { role } : {}) },
+    data: { email, passwordHash },
   });
 
   await notifyNewRegistration(user.email, user.role);

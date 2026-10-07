@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { api, setAuthToken } from '@/lib/api'
-import type { AuthResult, Role, User } from '@/types/api'
+import type { AuthResult, User } from '@/types/api'
 
 const STORAGE_KEY = 'elearning.auth'
 
@@ -33,8 +33,8 @@ export const useAuthStore = defineStore('auth', () => {
     }
   })
 
-  async function register(email: string, password: string, role: Role): Promise<void> {
-    const result = await api.post<AuthResult>('/auth/register', { email, password, role })
+  async function register(email: string, password: string): Promise<void> {
+    const result = await api.post<AuthResult>('/auth/register', { email, password })
     user.value = result.user
     token.value = result.token
   }
