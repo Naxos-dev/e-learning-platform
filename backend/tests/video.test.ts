@@ -60,6 +60,25 @@ describe('Video upload', () => {
     expect(res.status).toBe(400);
   });
 
+  it('rejects a videoKey using a path segment to point outside this chapter', async () => {
+    const { token, chapterId } = await setupChapter();
+    const { chapterId: otherChapterId } = await setupChapter();
+    const res = await request(app)
+      .patch(`/api/chapters/${chapterId}/video`)
+      .set(...authHeader(token))
+      .send({ videoKey: `videos/${chapterId}/../${otherChapterId}/x.mp4` });
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects a videoKey with an unexpected extension or malformed uuid segment', async () => {
+    const { token, chapterId } = await setupChapter();
+    const res = await request(app)
+      .patch(`/api/chapters/${chapterId}/video`)
+      .set(...authHeader(token))
+      .send({ videoKey: `videos/${chapterId}/not-a-uuid.mp4` });
+    expect(res.status).toBe(400);
+  });
+
   it('confirms an upload then clears it on delete', async () => {
     const { token, chapterId } = await setupChapter();
     const presign = await request(app)

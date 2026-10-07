@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createChapterSchema = z.object({
   title: z.string().trim().min(1, 'Le titre est requis').max(200),
-  content: z.string().optional(),
+  content: z.string().max(20000).optional(),
   order: z.number().int().positive('order doit être un entier positif').optional(),
 });
 

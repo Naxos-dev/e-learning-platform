@@ -42,10 +42,17 @@ export async function createUploadUrl(
   return { uploadUrl, videoKey };
 }
 
+const VIDEO_KEY_EXTENSIONS = Object.values(VIDEO_CONTENT_TYPES).join('|');
+
 export async function confirmUpload(chapterId: string, userId: string, videoKey: string) {
   const chapter = await assertChapterOwner(chapterId, userId);
 
-  if (!videoKey.startsWith(`videos/${chapterId}/`)) {
+  // Correspondance exacte (uuid + extension connue), pas un simple `startsWith` : une clé
+  // comme `videos/<chapterId>/../<autreChapterId>/x.mp4` passerait le préfixe alors que les
+  // navigateurs normalisent les segments `..` d'une URL avant la requête HTTP, pointant alors
+  // réellement vers l'objet d'un autre chapitre.
+  const keyPattern = new RegExp(`^videos/${chapterId}/[0-9a-f-]{36}\\.(${VIDEO_KEY_EXTENSIONS})$`);
+  if (!keyPattern.test(videoKey)) {
     throw new AppError(400, 'videoKey ne correspond pas à ce chapitre');
   }
 
