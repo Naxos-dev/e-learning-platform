@@ -4,6 +4,7 @@ import type { CreateChapterInput, UpdateChapterInput } from '../schemas/chapter.
 import { AppError } from '../utils/AppError.js';
 import { isUniqueConstraintError } from '../utils/prismaErrors.js';
 import { assertCourseOwner } from './course.service.js';
+import { isEnrolled } from './enrollment.service.js';
 
 // Aperçu public du syllabus : jamais de contenu/vidéo ici. Le contenu complet d'un chapitre
 // n'est servi que par getChapterDetail, route protégée par authenticate.
@@ -24,7 +25,28 @@ export function listChapters(courseId: string) {
   });
 }
 
-export async function getChapterDetail(chapterId: string) {
+// Premier chapitre (ordre le plus bas) d'un cours : consultable sans inscription, en aperçu.
+async function isFreePreviewChapter(courseId: string, chapterId: string): Promise<boolean> {
+  const firstChapter = await prisma.chapter.findFirst({
+    where: { courseId },
+    orderBy: { order: 'asc' },
+    select: { id: true },
+  });
+  return firstChapter?.id === chapterId;
+}
+
+async function hasFullChapterAccess(courseId: string, chapterId: string, userId: string): Promise<boolean> {
+  const course = await prisma.course.findUnique({ where: { id: courseId }, select: { authorId: true } });
+  if (course?.authorId === userId) {
+    return true;
+  }
+  if (await isFreePreviewChapter(courseId, chapterId)) {
+    return true;
+  }
+  return isEnrolled(userId, courseId);
+}
+
+export async function getChapterDetail(chapterId: string, userId: string) {
   const chapter = await prisma.chapter.findUnique({
     where: { id: chapterId },
     include: { quiz: { select: { id: true } } },
@@ -32,7 +54,26 @@ export async function getChapterDetail(chapterId: string) {
   if (!chapter) {
     throw new AppError(404, 'Chapitre introuvable');
   }
-  return chapter;
+
+  if (await hasFullChapterAccess(chapter.courseId, chapter.id, userId)) {
+    return { ...chapter, locked: false };
+  }
+
+  // Inscription requise : on renvoie le chapitre sans son contenu plutôt qu'une 403,
+  // pour que le frontend connaisse le titre/ordre et puisse proposer l'inscription.
+  return {
+    id: chapter.id,
+    courseId: chapter.courseId,
+    title: chapter.title,
+    order: chapter.order,
+    createdAt: chapter.createdAt,
+    updatedAt: chapter.updatedAt,
+    content: null,
+    videoUrl: null,
+    videoKey: null,
+    quiz: null,
+    locked: true,
+  };
 }
 
 export async function assertChapterOwner(chapterId: string, userId: string) {

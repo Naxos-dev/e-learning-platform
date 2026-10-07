@@ -2,6 +2,7 @@ import { prisma } from '../config/prisma.js';
 import type { QuestionInput } from '../schemas/quiz.schema.js';
 import { AppError } from '../utils/AppError.js';
 import { assertChapterOwner } from './chapter.service.js';
+import { isEnrolled } from './enrollment.service.js';
 
 export async function getQuizForChapter(chapterId: string, requesterId: string) {
   const chapter = await prisma.chapter.findUnique({
@@ -22,6 +23,12 @@ export async function getQuizForChapter(chapterId: string, requesterId: string) 
 
   if (chapter.course.authorId === requesterId) {
     return quiz;
+  }
+
+  // Le quiz exige toujours une inscription, même sur le premier chapitre (aperçu gratuit) :
+  // seul le contenu du chapitre est en libre accès, pas le quiz.
+  if (!(await isEnrolled(requesterId, chapter.courseId))) {
+    throw new AppError(403, 'Inscrivez-vous à ce cours pour accéder au quiz de ce chapitre');
   }
 
   // Les apprenants ne doivent pas voir les bonnes réponses avant d'avoir répondu.

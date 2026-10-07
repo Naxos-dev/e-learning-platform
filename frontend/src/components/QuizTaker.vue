@@ -3,7 +3,8 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { api, ApiError } from '@/lib/api'
 import type { Quiz, QuizSubmitResult } from '@/types/api'
 
-const props = defineProps<{ chapterId: string }>()
+const props = defineProps<{ chapterId: string; courseId: string }>()
+const emit = defineEmits<{ enrolled: [] }>()
 
 const quiz = ref<Quiz | null>(null)
 const loading = ref(true)
@@ -11,6 +12,8 @@ const error = ref<string | null>(null)
 const submitting = ref(false)
 const result = ref<QuizSubmitResult | null>(null)
 const answers = reactive<Record<string, string>>({})
+const locked = ref(false)
+const enrolling = ref(false)
 
 const allAnswered = computed(
   () => quiz.value !== null && quiz.value.questions.every((q) => Boolean(answers[q.id])),
@@ -18,14 +21,31 @@ const allAnswered = computed(
 
 async function loadQuiz() {
   loading.value = true
+  locked.value = false
   try {
     quiz.value = await api.get<Quiz>(`/chapters/${props.chapterId}/quiz`)
   } catch (err) {
-    if (!(err instanceof ApiError && err.status === 404)) {
+    if (err instanceof ApiError && err.status === 403) {
+      locked.value = true
+    } else if (!(err instanceof ApiError && err.status === 404)) {
       error.value = err instanceof ApiError ? err.message : 'Impossible de charger le quiz'
     }
   } finally {
     loading.value = false
+  }
+}
+
+async function handleEnroll() {
+  enrolling.value = true
+  error.value = null
+  try {
+    await api.post(`/courses/${props.courseId}/enroll`)
+    emit('enrolled')
+    await loadQuiz()
+  } catch (err) {
+    error.value = err instanceof ApiError ? err.message : "Impossible de s'inscrire"
+  } finally {
+    enrolling.value = false
   }
 }
 
@@ -54,6 +74,19 @@ onMounted(loadQuiz)
 
 <template>
   <div v-if="loading" class="text-sm text-slate-500">Chargement du quiz...</div>
+
+  <div v-else-if="locked" class="rounded-md border border-dashed border-slate-300 bg-slate-50 p-4 text-center">
+    <p class="text-sm text-slate-600">🔒 Inscrivez-vous à ce cours pour débloquer le quiz de ce chapitre.</p>
+    <button
+      type="button"
+      :disabled="enrolling"
+      class="mt-3 rounded-md bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-700 disabled:opacity-50"
+      @click="handleEnroll"
+    >
+      {{ enrolling ? 'Inscription...' : "S'inscrire pour débloquer le quiz" }}
+    </button>
+    <p v-if="error" class="mt-2 text-sm text-red-600">{{ error }}</p>
+  </div>
 
   <div v-else-if="quiz && quiz.questions.length > 0">
     <h3 class="text-lg font-semibold text-slate-900">Quiz</h3>
