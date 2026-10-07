@@ -18,6 +18,14 @@ const inProgressEnrollments = computed(() =>
   }),
 )
 
+// Un cours déjà rejoint vit dans "Continuer l'apprentissage" : il ne doit pas aussi
+// apparaître dans "Cours disponibles", sous peine de doublon et de confusion.
+const availableCourses = computed(() => {
+  if (myEnrollments.value.length === 0) return courses.value
+  const enrolledIds = new Set(myEnrollments.value.map((e) => e.course.id))
+  return courses.value.filter((course) => !enrolledIds.has(course.id))
+})
+
 const ACCENT_COLORS = [
   'border-t-indigo-400',
   'border-t-emerald-400',
@@ -124,11 +132,14 @@ onMounted(async () => {
 
     <p v-if="loading" class="text-slate-500">Chargement...</p>
     <p v-else-if="error" class="text-red-600">{{ error }}</p>
-    <p v-else-if="courses.length === 0" class="text-slate-500">Aucun cours pour le moment.</p>
+    <p v-else-if="availableCourses.length === 0 && courses.length > 0" class="text-slate-500">
+      Vous êtes déjà inscrit à tous les cours disponibles. 🎉
+    </p>
+    <p v-else-if="availableCourses.length === 0" class="text-slate-500">Aucun cours pour le moment.</p>
 
     <div v-else class="grid gap-4 sm:grid-cols-2">
       <RouterLink
-        v-for="course in courses"
+        v-for="course in availableCourses"
         :key="course.id"
         :to="{ name: 'course-detail', params: { courseId: course.id } }"
         class="block rounded-lg border border-t-4 border-slate-200 bg-white p-5 hover:border-slate-400"
