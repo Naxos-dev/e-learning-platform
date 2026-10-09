@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import type { CourseSummary, EnrollmentSummary } from '@/types/api'
 
 const auth = useAuthStore()
@@ -130,7 +131,7 @@ onMounted(async () => {
 
     <h2 class="mb-6 text-2xl font-semibold text-slate-900">Cours disponibles</h2>
 
-    <p v-if="loading" class="text-slate-500">Chargement...</p>
+    <LoadingIndicator v-if="loading" />
     <p v-else-if="error" class="text-red-600">{{ error }}</p>
     <p v-else-if="availableCourses.length === 0 && courses.length > 0" class="text-slate-500">
       Vous êtes déjà inscrit à tous les cours disponibles. 🎉

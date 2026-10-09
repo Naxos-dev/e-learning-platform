@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import VideoUploader from '@/components/VideoUploader.vue'
 import QuizManager from '@/components/QuizManager.vue'
 import QuizTaker from '@/components/QuizTaker.vue'
@@ -137,7 +138,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <p v-if="loading" class="text-slate-500">Chargement...</p>
+    <LoadingIndicator v-if="loading" />
 
     <div v-else-if="needsLogin" class="rounded-md border border-slate-200 bg-slate-50 p-6 text-center">
       <p class="text-slate-700">🔒 Ce chapitre est réservé aux membres connectés.</p>

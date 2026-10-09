@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import type { ChapterSummary, CourseDetail, EnrollmentSummary } from '@/types/api'
 
 const props = defineProps<{ courseId: string }>()
@@ -102,7 +103,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <p v-if="loading" class="text-slate-500">Chargement...</p>
+    <LoadingIndicator v-if="loading" />
     <p v-else-if="error && !course" class="text-red-600">{{ error }}</p>
 
     <template v-else-if="course">
