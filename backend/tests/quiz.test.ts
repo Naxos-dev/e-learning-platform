@@ -12,7 +12,7 @@ async function setupChapter() {
     .post(`/api/courses/${course.body.id}/chapters`)
     .set(...authHeader(token))
     .send({ title: 'Ch' });
-  return { token, chapterId: chapter.body.id as string };
+  return { token, courseId: course.body.id as string, chapterId: chapter.body.id as string };
 }
 
 describe('Quiz questions', () => {
@@ -61,8 +61,17 @@ describe('Quiz questions', () => {
     expect(res.status).toBe(401);
   });
 
+  it('requires enrollment to view a quiz, even on the free-preview (first) chapter', async () => {
+    const { chapterId } = await setupChapter();
+    const { token: otherToken } = await registerUser(uniqueEmail('other'), 'APPRENANT');
+    const res = await request(app)
+      .get(`/api/chapters/${chapterId}/quiz`)
+      .set(...authHeader(otherToken));
+    expect(res.status).toBe(403);
+  });
+
   it('hides isCorrect from a non-owner and reveals it to the owner', async () => {
-    const { token, chapterId } = await setupChapter();
+    const { token, chapterId, courseId } = await setupChapter();
     await request(app)
       .post(`/api/chapters/${chapterId}/questions`)
       .set(...authHeader(token))
@@ -75,6 +84,9 @@ describe('Quiz questions', () => {
       });
 
     const { token: otherToken } = await registerUser(uniqueEmail('other'), 'APPRENANT');
+    await request(app)
+      .post(`/api/courses/${courseId}/enroll`)
+      .set(...authHeader(otherToken));
     const asOther = await request(app)
       .get(`/api/chapters/${chapterId}/quiz`)
       .set(...authHeader(otherToken));

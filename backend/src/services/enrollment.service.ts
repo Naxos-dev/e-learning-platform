@@ -18,10 +18,21 @@ export async function enrollInCourse(userId: string, courseId: string) {
   }
 }
 
-export async function getEnrollmentOrThrow(userId: string, courseId: string) {
-  const enrollment = await prisma.enrollment.findUnique({
+// Point d'entrée unique pour "cet utilisateur est-il inscrit à ce cours ?" : chapter.service.ts
+// et quiz.service.ts s'appuient dessus plutôt que de refaire la même requête Prisma, pour que
+// la définition de "inscrit" ne puisse pas diverger entre les différents points d'accès.
+export function findEnrollment(userId: string, courseId: string) {
+  return prisma.enrollment.findUnique({
     where: { userId_courseId: { userId, courseId } },
   });
+}
+
+export async function isEnrolled(userId: string, courseId: string): Promise<boolean> {
+  return Boolean(await findEnrollment(userId, courseId));
+}
+
+export async function getEnrollmentOrThrow(userId: string, courseId: string) {
+  const enrollment = await findEnrollment(userId, courseId);
   if (!enrollment) {
     throw new AppError(403, "Vous n'êtes pas inscrit à ce cours");
   }

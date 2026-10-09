@@ -23,7 +23,7 @@ export async function listChapters(req: Request, res: Response): Promise<void> {
 }
 
 export async function getChapter(req: Request, res: Response): Promise<void> {
-  const chapter = await chapterService.getChapterDetail(requireParam(req, 'chapterId'));
+  const chapter = await chapterService.getChapterDetail(requireParam(req, 'chapterId'), req.user!.id);
   res.json(chapter);
 }
 

@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth'
-import type { CourseDetail, EnrollmentSummary } from '@/types/api'
+import type { ChapterSummary, CourseDetail, EnrollmentSummary } from '@/types/api'
 
 const props = defineProps<{ courseId: string }>()
 const auth = useAuthStore()
@@ -18,6 +18,27 @@ const enrollmentChecked = ref(false)
 const completedChapterIds = ref<Set<string>>(new Set())
 
 const isOwner = computed(() => auth.isFormateur && auth.user?.id === course.value?.authorId)
+
+// Le premier chapitre (index 0, la liste étant déjà triée par ordre) est en aperçu gratuit :
+// accessible sans inscription. Les suivants demandent de s'inscrire au cours.
+function chapterBadge(chapter: ChapterSummary, index: number): { label: string; class: string } | null {
+  if (isOwner.value) return null
+  if (!auth.isAuthenticated) return { label: '🔒 Connexion requise', class: 'text-slate-400' }
+  if (completedChapterIds.value.has(chapter.id)) {
+    return { label: '✓ Terminé', class: 'font-medium text-green-700' }
+  }
+  if (isEnrolled.value) return null
+  if (index === 0) return { label: '✨ Aperçu gratuit', class: 'font-medium text-indigo-600' }
+  return { label: '🔒 Inscription requise', class: 'text-slate-400' }
+}
+
+const chaptersWithBadge = computed(() => {
+  if (!course.value) return []
+  return course.value.chapters.map((chapter, index) => ({
+    chapter,
+    badge: chapterBadge(chapter, index),
+  }))
+})
 
 async function loadCourse() {
   loading.value = true
@@ -145,20 +166,14 @@ onMounted(() => {
         <p v-if="course.chapters.length === 0" class="text-slate-500">Aucun chapitre pour le moment.</p>
 
         <ol v-else class="space-y-2">
-          <li v-for="chapter in course.chapters" :key="chapter.id">
+          <li v-for="{ chapter, badge } in chaptersWithBadge" :key="chapter.id">
             <RouterLink
               :to="{ name: 'chapter-detail', params: { chapterId: chapter.id } }"
               class="flex items-center justify-between rounded-md border border-slate-200 bg-white px-4 py-3 hover:border-slate-400"
             >
               <span class="text-slate-800">{{ chapter.order }}. {{ chapter.title }}</span>
-              <span v-if="!auth.isAuthenticated" class="flex items-center gap-1 text-xs text-slate-400">
-                🔒 Connexion requise
-              </span>
-              <span
-                v-else-if="completedChapterIds.has(chapter.id)"
-                class="flex items-center gap-1 text-xs font-medium text-green-700"
-              >
-                ✓ Terminé
+              <span v-if="badge" class="flex items-center gap-1 text-xs" :class="badge.class">
+                {{ badge.label }}
               </span>
             </RouterLink>
           </li>

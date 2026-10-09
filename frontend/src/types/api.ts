@@ -39,6 +39,8 @@ export interface ChapterSummary {
 }
 
 // Chapitre complet : uniquement renvoyé par GET /chapters/:id, qui exige d'être connecté.
+// Si `locked` est true, le chapitre existe mais son contenu n'est pas accessible
+// (inscription au cours requise) : les champs contenu/vidéo/quiz sont alors à null.
 export interface Chapter {
   id: string
   courseId: string
@@ -49,10 +51,7 @@ export interface Chapter {
   videoKey: string | null
   createdAt: string
   updatedAt: string
-}
-
-export interface ChapterDetail extends Chapter {
-  quiz: { id: string } | null
+  locked: boolean
 }
 
 export interface CourseDetail {
