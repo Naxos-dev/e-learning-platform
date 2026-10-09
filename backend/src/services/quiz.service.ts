@@ -4,6 +4,19 @@ import { AppError } from '../utils/AppError.js';
 import { assertChapterOwner } from './chapter.service.js';
 import { isEnrolled } from './enrollment.service.js';
 
+// Les questions (seed ou créées via l'UI formateur) listent souvent la bonne réponse en
+// premier : sans mélange, elle serait quasi toujours en première position pour l'apprenant.
+function shuffle<T>(items: T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = result[i]!;
+    result[i] = result[j]!;
+    result[j] = temp;
+  }
+  return result;
+}
+
 export async function getQuizForChapter(chapterId: string, requesterId: string) {
   const chapter = await prisma.chapter.findUnique({
     where: { id: chapterId },
@@ -31,12 +44,13 @@ export async function getQuizForChapter(chapterId: string, requesterId: string) 
     throw new AppError(403, 'Inscrivez-vous à ce cours pour accéder au quiz de ce chapitre');
   }
 
-  // Les apprenants ne doivent pas voir les bonnes réponses avant d'avoir répondu.
+  // Les apprenants ne doivent pas voir les bonnes réponses avant d'avoir répondu,
+  // et les options sont mélangées pour qu'elles ne soient pas toujours dans le même ordre.
   return {
     ...quiz,
     questions: quiz.questions.map((question) => ({
       ...question,
-      options: question.options.map(({ id, text }) => ({ id, text })),
+      options: shuffle(question.options.map(({ id, text }) => ({ id, text }))),
     })),
   };
 }
