@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { app, authHeader, registerUser, uniqueEmail } from './helpers.js';
 
 describe('Auth', () => {
-  it('registers a new user with a role', async () => {
+  it('always registers as APPRENANT, even if the client sends a role', async () => {
     const email = uniqueEmail('formateur');
     const res = await request(app)
       .post('/api/auth/register')
@@ -11,16 +11,9 @@ describe('Auth', () => {
 
     expect(res.status).toBe(201);
     expect(res.body.user.email).toBe(email);
-    expect(res.body.user.role).toBe('FORMATEUR');
+    expect(res.body.user.role).toBe('APPRENANT');
     expect(res.body.user.passwordHash).toBeUndefined();
     expect(res.body.token).toEqual(expect.any(String));
-  });
-
-  it('defaults role to APPRENANT when omitted', async () => {
-    const email = uniqueEmail('apprenant');
-    const res = await request(app).post('/api/auth/register').send({ email, password: 'password123' });
-    expect(res.status).toBe(201);
-    expect(res.body.user.role).toBe('APPRENANT');
   });
 
   it('rejects a duplicate email with 409', async () => {

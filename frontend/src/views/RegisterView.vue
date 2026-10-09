@@ -3,14 +3,12 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { ApiError } from '@/lib/api'
-import type { Role } from '@/types/api'
 
 const auth = useAuthStore()
 const router = useRouter()
 
 const email = ref('')
 const password = ref('')
-const role = ref<Role>('APPRENANT')
 const error = ref<string | null>(null)
 const loading = ref(false)
 
@@ -18,7 +16,7 @@ async function handleSubmit() {
   error.value = null
   loading.value = true
   try {
-    await auth.register(email.value, password.value, role.value)
+    await auth.register(email.value, password.value)
     await router.push('/')
   } catch (err) {
     error.value = err instanceof ApiError ? err.message : 'Une erreur est survenue'
@@ -57,20 +55,6 @@ async function handleSubmit() {
           />
           <p class="mt-1 text-xs text-slate-500">8 caractères minimum</p>
         </div>
-
-        <fieldset>
-          <legend class="block text-sm font-medium text-slate-700">Je suis...</legend>
-          <div class="mt-1 flex gap-4">
-            <label class="flex items-center gap-2 text-sm text-slate-700">
-              <input v-model="role" type="radio" value="APPRENANT" />
-              Apprenant
-            </label>
-            <label class="flex items-center gap-2 text-sm text-slate-700">
-              <input v-model="role" type="radio" value="FORMATEUR" />
-              Formateur
-            </label>
-          </div>
-        </fieldset>
 
         <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
 
