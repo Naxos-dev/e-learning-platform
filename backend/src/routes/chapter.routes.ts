@@ -5,6 +5,7 @@ import { submitQuiz, updateProgress } from '../controllers/progress.controller.j
 import { createQuestion, getChapterQuiz } from '../controllers/quiz.controller.js';
 import { confirmVideoUpload, deleteVideo, presignVideoUpload } from '../controllers/video.controller.js';
 import { authenticate, authorize } from '../middlewares/auth.js';
+import { presignVideoLimiter } from '../middlewares/rateLimit.js';
 
 export const chapterRouter = Router();
 
@@ -17,6 +18,7 @@ chapterRouter.post('/:chapterId/questions', authenticate, authorize(Role.FORMATE
 
 chapterRouter.post(
   '/:chapterId/video/presign',
+  presignVideoLimiter,
   authenticate,
   authorize(Role.FORMATEUR),
   presignVideoUpload,

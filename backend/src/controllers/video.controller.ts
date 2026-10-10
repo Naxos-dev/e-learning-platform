@@ -13,6 +13,7 @@ export async function presignVideoUpload(req: Request, res: Response): Promise<v
     requireParam(req, 'chapterId'),
     req.user!.id,
     parsed.data.contentType,
+    parsed.data.fileSize,
   );
   res.json(result);
 }
