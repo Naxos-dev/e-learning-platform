@@ -1,7 +1,16 @@
 # E-learning Platform
 
 Mini-plateforme e-learning (cours, chapitres, quiz, suivi de progression) — projet portfolio
-axé sur les compétences backend : Node.js, TypeScript, PostgreSQL/Prisma, upload S3, JWT.
+fullstack : Node.js, TypeScript, PostgreSQL/Prisma, upload S3, JWT.
+
+## Fonctionnalités
+
+- Rôles `formateur` / `apprenant` avec authentification JWT
+- Gestion de cours, chapitres et quiz
+- Upload vidéo direct navigateur → S3 via URLs pré-signées
+- Suivi de progression par apprenant et par chapitre
+- Dashboard formateur avec agrégation des scores de quiz
+- Suite de tests Vitest + Supertest sur les routes critiques
 
 ## Démo en ligne
 
@@ -80,7 +89,7 @@ montrer le flow complet (upload direct navigateur → S3 → lecture publique).
 
 ## Tests
 
-Suite Vitest + Supertest (37 tests) contre une branche Neon dédiée (jamais la base de dev/prod) :
+Suite Vitest + Supertest (44 tests) contre une branche Neon dédiée (jamais la base de dev/prod) :
 auth, ownership cours/chapitres/quiz, scoring de quiz, inscription/progression, agrégation du
 dashboard formateur, upload vidéo (SDK S3 mocké).
 
@@ -103,15 +112,3 @@ automatiquement avant chaque run (`globalSetup`).
   Router, sinon 404 sur tout accès direct à une route type `/courses/:id`)
 - **Base de données** : Neon (branche par défaut, distincte de la branche `test`)
 - **CORS** : `CORS_ORIGIN` (backend) et la bucket policy CORS S3 doivent inclure le domaine Vercel
-
-## Avancement
-
-- [x] Étape 1 — squelette du backend (Express/TS, structure routes/controllers/services)
-- [x] Étape 2 — Prisma + schéma PostgreSQL
-- [x] Étape 3 — Auth JWT + middleware de rôles
-- [x] Étape 4 — API cours/chapitres/quiz
-- [x] Étape 5 — Upload vidéo S3 (URLs pré-signées)
-- [x] Étape 6 — Inscription/progression + dashboard formateur
-- [x] Étape 7 — Tests sur les routes critiques (36 tests, Vitest + Supertest)
-- [x] Étape 8 — Frontend Vue (auth, cours/chapitres, quiz, progression, dashboard formateur, upload vidéo)
-- [x] Étape 9 — Déploiement (backend Render, frontend Vercel, testé de bout en bout en production)
