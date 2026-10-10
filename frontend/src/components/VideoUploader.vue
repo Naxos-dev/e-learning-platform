@@ -7,6 +7,8 @@ const props = defineProps<{ chapterId: string; videoUrl: string | null }>()
 const emit = defineEmits<{ 'update:videoUrl': [url: string | null] }>()
 
 const ALLOWED_TYPES = ['video/mp4', 'video/webm', 'video/quicktime']
+const MAX_VIDEO_MB = 100
+const MAX_VIDEO_BYTES = MAX_VIDEO_MB * 1024 * 1024
 
 const uploading = ref(false)
 const progress = ref(0)
@@ -41,12 +43,17 @@ async function handleFileChange(event: Event) {
     return
   }
 
+  if (file.size > MAX_VIDEO_BYTES) {
+    error.value = `Fichier trop volumineux (max ${MAX_VIDEO_MB} Mo)`
+    return
+  }
+
   uploading.value = true
   progress.value = 0
   try {
     const { uploadUrl, videoKey } = await api.post<PresignedUpload>(
       `/chapters/${props.chapterId}/video/presign`,
-      { contentType: file.type },
+      { contentType: file.type, fileSize: file.size },
     )
     await uploadToS3(uploadUrl, file, (pct) => {
       progress.value = pct

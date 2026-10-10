@@ -26,16 +26,21 @@ export async function createUploadUrl(
   chapterId: string,
   userId: string,
   contentType: PresignVideoInput['contentType'],
+  fileSize: number,
 ) {
   await assertChapterOwner(chapterId, userId);
 
   const extension = VIDEO_CONTENT_TYPES[contentType];
   const videoKey = `videos/${chapterId}/${randomUUID()}.${extension}`;
 
+  // ContentLength est un en-tête signé (non "hoistable" vers la query string) : S3 rejette
+  // toute requête PUT dont le Content-Length réel ne correspond pas exactement à cette
+  // valeur, ce qui fait respecter fileSize côté S3 sans contrôle applicatif supplémentaire.
   const command = new PutObjectCommand({
     Bucket: env.AWS_S3_BUCKET,
     Key: videoKey,
     ContentType: contentType,
+    ContentLength: fileSize,
   });
   const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: UPLOAD_URL_EXPIRY_SECONDS });
 
