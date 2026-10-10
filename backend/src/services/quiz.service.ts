@@ -26,6 +26,15 @@ export async function getQuizForChapter(chapterId: string, requesterId: string) 
     throw new AppError(404, 'Chapitre introuvable');
   }
 
+  const isOwner = chapter.course.authorId === requesterId;
+
+  // Le quiz exige toujours une inscription, même sur le premier chapitre (aperçu gratuit) :
+  // seul le contenu du chapitre est en libre accès, pas le quiz. Ce check doit précéder la
+  // recherche du quiz pour ne pas révéler son existence à un apprenant non inscrit.
+  if (!isOwner && !(await isEnrolled(requesterId, chapter.courseId))) {
+    throw new AppError(403, 'Inscrivez-vous à ce cours pour accéder au quiz de ce chapitre');
+  }
+
   const quiz = await prisma.quiz.findUnique({
     where: { chapterId },
     include: { questions: { orderBy: { id: 'asc' }, include: { options: true } } },
@@ -34,14 +43,8 @@ export async function getQuizForChapter(chapterId: string, requesterId: string) 
     throw new AppError(404, "Ce chapitre n'a pas encore de quiz");
   }
 
-  if (chapter.course.authorId === requesterId) {
+  if (isOwner) {
     return quiz;
-  }
-
-  // Le quiz exige toujours une inscription, même sur le premier chapitre (aperçu gratuit) :
-  // seul le contenu du chapitre est en libre accès, pas le quiz.
-  if (!(await isEnrolled(requesterId, chapter.courseId))) {
-    throw new AppError(403, 'Inscrivez-vous à ce cours pour accéder au quiz de ce chapitre');
   }
 
   // Les apprenants ne doivent pas voir les bonnes réponses avant d'avoir répondu,
