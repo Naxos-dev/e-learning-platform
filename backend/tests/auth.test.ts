@@ -23,6 +23,15 @@ describe('Auth', () => {
     expect(res.status).toBe(409);
   });
 
+  it('rejects malformed JSON with 400 and no internal parser message', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .set('Content-Type', 'application/json')
+      .send('{bad');
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: 'Corps de requête JSON invalide' });
+  });
+
   it('rejects invalid payloads with 400', async () => {
     const res = await request(app)
       .post('/api/auth/register')
