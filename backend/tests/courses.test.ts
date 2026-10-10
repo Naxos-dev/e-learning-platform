@@ -29,6 +29,24 @@ describe('Courses & chapters', () => {
     expect(list.body.some((c: { id: string }) => c.id === create.body.id)).toBe(true);
   });
 
+  it('never exposes the author email in the public list or course detail', async () => {
+    const email = uniqueEmail('formateur');
+    const { token } = await registerUser(email, 'FORMATEUR');
+    const create = await request(app)
+      .post('/api/courses')
+      .set(...authHeader(token))
+      .send({ title: 'Vue 3', description: 'desc' });
+
+    const list = await request(app).get('/api/courses');
+    expect(JSON.stringify(list.body)).not.toContain(email);
+    const listed = list.body.find((c: { id: string }) => c.id === create.body.id);
+    expect(listed.author).toEqual({ id: expect.any(String), name: email.split('@')[0] });
+
+    const detail = await request(app).get(`/api/courses/${create.body.id}`);
+    expect(JSON.stringify(detail.body)).not.toContain(email);
+    expect(detail.body.author).toEqual({ id: expect.any(String), name: email.split('@')[0] });
+  });
+
   it('returns 404 for an unknown course', async () => {
     const res = await request(app).get('/api/courses/00000000-0000-0000-0000-000000000000');
     expect(res.status).toBe(404);

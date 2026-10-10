@@ -151,7 +151,7 @@ onMounted(async () => {
           {{ course.description }}
         </p>
         <div class="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-slate-500">
-          <span>Par {{ course.author.email }}</span>
+          <span>Par {{ course.author.name }}</span>
           <span>{{ course._count.chapters }} chapitre(s) · {{ course._count.enrollments }} inscrit(s)</span>
         </div>
       </RouterLink>
