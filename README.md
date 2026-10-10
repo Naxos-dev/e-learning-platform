@@ -89,7 +89,7 @@ montrer le flow complet (upload direct navigateur → S3 → lecture publique).
 
 ## Tests
 
-Suite Vitest + Supertest (44 tests) contre une branche Neon dédiée (jamais la base de dev/prod) :
+Suite Vitest + Supertest contre une branche Neon dédiée (jamais la base de dev/prod) :
 auth, ownership cours/chapitres/quiz, scoring de quiz, inscription/progression, agrégation du
 dashboard formateur, upload vidéo (SDK S3 mocké).
 
@@ -106,7 +106,7 @@ automatiquement avant chaque run (`globalSetup`).
 ## Déploiement
 
 - **Backend** : Render (Web Service), root `backend/`, build `npm install && npx prisma migrate
-  deploy && npm run build`, start `npm start`, health check `/api/health`
+deploy && npm run build`, start `npm start`, health check `/api/health`
 - **Frontend** : Vercel, root `frontend/`, preset Vite, variable `VITE_API_URL` pointant vers l'API
   Render (+ `/api`). `vercel.json` contient un rewrite SPA (obligatoire en mode `history` de Vue
   Router, sinon 404 sur tout accès direct à une route type `/courses/:id`)
