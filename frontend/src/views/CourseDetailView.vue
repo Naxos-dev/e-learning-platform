@@ -110,7 +110,7 @@ onMounted(() => {
       <div class="flex items-start justify-between gap-4">
         <div>
           <h1 class="text-2xl font-semibold text-slate-900">{{ course.title }}</h1>
-          <p class="mt-1 text-sm text-slate-500">Par {{ course.author.email }}</p>
+          <p class="mt-1 text-sm text-slate-500">Par {{ course.author.name }}</p>
         </div>
 
         <div v-if="isOwner" class="flex shrink-0 gap-2">

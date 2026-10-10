@@ -14,7 +14,7 @@ export interface AuthResult {
 
 export interface CourseAuthor {
   id: string
-  email: string
+  name: string
 }
 
 export interface CourseSummary {

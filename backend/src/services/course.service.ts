@@ -1,6 +1,7 @@
 import { prisma } from '../config/prisma.js';
 import type { CreateCourseInput, UpdateCourseInput } from '../schemas/course.schema.js';
 import { AppError } from '../utils/AppError.js';
+import { emailToDisplayName } from '../utils/displayName.js';
 import { chapterSummarySelect } from './chapter.service.js';
 
 export function createCourse(authorId: string, input: CreateCourseInput) {
@@ -13,14 +14,21 @@ export function createCourse(authorId: string, input: CreateCourseInput) {
   });
 }
 
-export function listCourses() {
-  return prisma.course.findMany({
+export async function listCourses() {
+  const courses = await prisma.course.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
       author: { select: { id: true, email: true } },
       _count: { select: { chapters: true, enrollments: true } },
     },
   });
+
+  // L'email de l'auteur ne doit jamais sortir de l'API (route publique) : on le remplace par
+  // un nom d'affichage avant de renvoyer la réponse, voir utils/displayName.ts.
+  return courses.map((course) => ({
+    ...course,
+    author: { id: course.author.id, name: emailToDisplayName(course.author.email) },
+  }));
 }
 
 export async function getCourseDetail(courseId: string) {
@@ -34,7 +42,10 @@ export async function getCourseDetail(courseId: string) {
   if (!course) {
     throw new AppError(404, 'Cours introuvable');
   }
-  return course;
+  return {
+    ...course,
+    author: { id: course.author.id, name: emailToDisplayName(course.author.email) },
+  };
 }
 
 export async function assertCourseOwner(courseId: string, userId: string) {
