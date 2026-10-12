@@ -14,7 +14,7 @@ fullstack : Node.js, TypeScript, PostgreSQL/Prisma, upload S3, JWT.
 
 ## Démo en ligne
 
-- **App** : https://e-learning-platform-three-livid.vercel.app
+- **App** : https://learnflow-project.vercel.app
 - **API** : https://e-learning-platform-xdh8.onrender.com/api/health
 - Comptes de démo : voir [Données de démo](#données-de-démo) ci-dessous
 
